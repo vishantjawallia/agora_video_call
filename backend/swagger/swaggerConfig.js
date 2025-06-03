@@ -9,11 +9,7 @@ const options = {
       version: '1.0.0',
       description: 'API documentation for the Agora video calling backend',
     },
-    servers: [
-      {
-        url: 'http://192.168.56.1:3000/api',
-      },
-    ],
+    // Do not set servers here statically
   },
   apis: ['./routes/*.js'], // Swagger will scan route files for documentation
 };
@@ -21,7 +17,18 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 function setupSwagger(app) {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/api-docs', (req, res, next) => {
+    // Build the full domain + port + /api dynamically
+    const host = req.get('host'); // e.g., localhost:3000 or yourdomain.com
+    const protocol = req.protocol; // http or https
+    swaggerSpec.servers = [
+      {
+        url: `${protocol}://${host}/api`,
+      },
+    ];
+    swaggerUi.setup(swaggerSpec)(req, res, next);
+  });
+  app.use('/api-docs', swaggerUi.serve);
 }
 
 module.exports = setupSwagger;
