@@ -44,7 +44,7 @@ router.post('/generate-token', (req, res) => {
 
   try {
     if (!channelName || uid == null) {
-      return res.status(400).json({ message: "channelName and uid are required" });
+      // return res.status(400).json({ message: "channelName and uid are required" });
     }
 
     const appID = process.env.AGORA_APP_ID;
